@@ -88,21 +88,29 @@ export default class WindowGroupComponent extends BaseComponent {
 
     @selfbind
     mouseDown(id, ev) {
-        const idx = this.findIndexOfId(id);
-        // debugger;
-        this.setState({
-            selected: id, 
-            stage: "activating",
-            locations: this.state.staticLocations.map(
-                (it, index) => it + this.offsetWidth(index, idx) - ((idx === index) && this.offsets.zoom / 2 || 0)
-            ),
-            widths: this.state.items.map((it, index) => it.props.width + (this.sizes.margin < 0 && this.sizes.margin * this.state.percentages[index]) + (index === idx && this.offsets.zoom || 0)),
-            verticals: this.state.items.map((it, index) => this.offsets.top - (index === idx && this.offsets.zoom || 0)),
-            zindexes: this.state.items.map((it, index) => (index === idx && 2 || 1)),
-        });
-        this.unsetTimer();
-        this.setTimer(() => this.setState({stage: "activated"}));
-        ev.preventDefault()
+        let capture = ev.target.dataset["capture"], node = ev.target;
+        while (!capture && node) {
+            if (node.dataset && node.dataset["nocapture"]) break;
+            capture = node.dataset && node.dataset["capture"] && !node.dataset["root"];
+            node = node.parentNode;
+        }
+        if (capture){
+            console.log("CAPTURE", ev.target.dataset["capture"], ev.target);
+            const idx = this.findIndexOfId(id);
+            this.setState({
+                selected: id, 
+                stage: "activating",
+                locations: this.state.staticLocations.map(
+                    (it, index) => it + this.offsetWidth(index, idx) - ((idx === index) && this.offsets.zoom / 2 || 0)
+                ),
+                widths: this.state.items.map((it, index) => it.props.width + (this.sizes.margin < 0 && this.sizes.margin * this.state.percentages[index]) + (index === idx && this.offsets.zoom || 0)),
+                verticals: this.state.items.map((it, index) => this.offsets.top - (index === idx && this.offsets.zoom || 0)),
+                zindexes: this.state.items.map((it, index) => (index === idx && 2 || 1)),
+            });
+            this.unsetTimer();
+            this.setTimer(() => this.setState({stage: "activated"}));
+            ev.preventDefault();
+        }
     }
 
     @selfbind

@@ -6,7 +6,7 @@ var TransferWebpackPlugin = require('transfer-webpack-plugin');
 var devFlagPlugin = new webpack.DefinePlugin({
     __DEV__: JSON.stringify(JSON.parse(process.env.DEBUG || 'false')),
     __CHROMEAPP__: JSON.stringify(JSON.parse((process.env.ENV || "browser").toLowerCase() === "chrome" || 'false')),
-    __NAME__: `"${(process.env.SITENAME || "Testing Explorer")}"`,
+    __NAME__: `"${(process.env.SITENAME || "Questly")}"`,
     __BASEURL__: `"${(process.env.BASEURL || "/")}"`,
 });
 

@@ -1,4 +1,8 @@
 @import "../_variables"
+@import "../../../../node_modules/nib/lib/nib/index.styl"
+
+titleh=35px
+pad=15px
 
 .wrapper
     display block
@@ -8,3 +12,38 @@
     border-radius 0
     padding 15px
     transition all 1s mdtiming
+    position relative
+    &:before
+        content ""
+        position absolute
+        top 0
+        right 0
+        height 50%
+        width 1px
+        background linear-gradient(top, #eee 0%, #fff 100%)
+
+.title
+    position absolute
+    top 0
+    left 0
+    right 0
+    height titleh
+    margin 0
+    padding 0 pad
+    line-height titleh
+    border-bottom solid 1px #eee
+    cursor move
+    
+.inner
+    position absolute
+    top titleh
+    left 0
+    right 0
+    bottom 0
+    padding pad
+    
+.right
+    float right
+    cursor default
+    :global(.mdi)
+        cursor pointer
