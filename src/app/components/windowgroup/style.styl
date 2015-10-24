@@ -1,0 +1,18 @@
+@import "../_variables"
+marg=100px
+
+.wrapper
+    display flex
+    flex-flow row nowrap
+    height s('calc(%s - %s)', hundred, marg)
+    margin 50px 0
+    
+.itemwrapper
+    display flex
+    width 300px
+    height 100%
+    transition: all 0.3s ease-in-out;
+    &.hidden
+        transform: scale(0.5);
+        opacity: 0;
+        width: 0;

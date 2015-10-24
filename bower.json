@@ -1,0 +1,19 @@
+{
+  "name": "Explorer",
+  "version": "0.0.1",
+  "homepage": "https://github.com/sabinmarcu/minimal-explorer",
+  "authors": [
+    "Sabin Marcu <sabinmarcu@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "load-awesome": "~1.1.0"
+  }
+}

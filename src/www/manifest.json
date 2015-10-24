@@ -1,0 +1,14 @@
+{
+    "name": "Tasky",
+    "description": "Cool Thingy",
+    "version": "0.1",
+    "manifest_version": 2,
+    "app": {
+        "background": {
+            "scripts": ["chrome/chrome.js"]
+        }
+    },
+    "sandbox": {
+        "pages": ["index.html"]
+    }
+}

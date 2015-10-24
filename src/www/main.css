@@ -1,0 +1,53 @@
+html {
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.footer{
+    color: #ddd;
+    position: relative;
+    margin-top: 10px;
+    text-align: left;
+}
+
+.footer > span#links {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+}
+
+.footer #ownsite {
+    margin-left: 5px;
+    margin-top: 3px;
+}
+
+.footer #thisrepo {
+    float: right;
+}
+
+.footer #thisrepo > span {
+    margin-right: 5px;
+}
+
+.footer, .footer * {
+    vertical-align: middle;
+}
+
+@media (max-width: 600px) {
+    .footer > span#links {
+        text-align: right;
+    }
+    .footer > span#links .spacer {
+        padding: 0;
+    }
+    .footer #thisrepo{
+        display: none;
+    }
+}

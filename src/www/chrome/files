@@ -1,0 +1,15 @@
+bootstrap.js
+chrome.js
+config.json
+icons
+icons/config.json
+icons/fullscreen-exit.png
+icons/fullscreen.png
+icons/index.html
+icons/window-close.png
+icons/window-maximize.png
+icons/window-minimize.png
+icons/window-restore.png
+index.html
+preview.png
+readme.md

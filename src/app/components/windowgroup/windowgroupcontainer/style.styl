@@ -1,0 +1,15 @@
+@import "../../_variables"
+
+.wrapper
+    display flex
+    height 100%
+    box-shadow 0 4px 8px rgba(black, 0.2)
+    margin 0
+    overflow hidden
+    &.dragging:global(.activated)
+        margin 0 25px
+        transform scale(1.05)
+        border-radius 4px
+    &:global(.activated), &:global(.activating), &:global(.deactivating)
+        transition all 1s mdtiming
+            

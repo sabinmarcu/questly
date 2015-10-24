@@ -1,0 +1,22 @@
+chrome
+chrome/bootstrap.js
+chrome/chrome.js
+chrome/config.json
+chrome/icons
+chrome/icons/config.json
+chrome/icons/fullscreen-exit.png
+chrome/icons/fullscreen.png
+chrome/icons/index.html
+chrome/icons/window-close.png
+chrome/icons/window-maximize.png
+chrome/icons/window-minimize.png
+chrome/icons/window-restore.png
+chrome/index.html
+chrome/Lab Experiments.html
+chrome/preview.png
+chrome/readme.md
+config.json.bak
+index.html
+main.css
+manifest.json
+readme.md
