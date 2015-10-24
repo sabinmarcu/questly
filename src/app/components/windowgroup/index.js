@@ -36,13 +36,20 @@ export default class WindowGroupComponent extends BaseComponent {
 
     componentDidMount() {
         this.refreshThings();
-        window.addEventListener("resize", this.refreshThings);
+        setTimeout(this.refreshThings, 100);
+        setTimeout(this.refreshThings, 200);
+        window.addEventListener("resize", () => {
+            this.refreshThings();
+            setTimeout(this.refreshThings, 100);
+            setTimeout(this.refreshThings, 200);
+        });
         window.addEventListener("mouseup", this.mouseUp);
         window.addEventListener("mouseleave", this.mouseUp);
     }
 
     @selfbind
     refreshThings() {
+        console.log("Refreshing Things");
         let widths = this.props.children.map(it => it.props.width),
             percentages = widths.map(it => it / this.sizes.width);
         widths = widths.map((it, index) => it + (this.sizes.margin < 0 && this.sizes.margin * percentages[index] ));
@@ -95,7 +102,6 @@ export default class WindowGroupComponent extends BaseComponent {
             node = node.parentNode;
         }
         if (capture){
-            console.log("CAPTURE", ev.target.dataset["capture"], ev.target);
             const idx = this.findIndexOfId(id);
             this.setState({
                 selected: id, 
@@ -129,7 +135,15 @@ export default class WindowGroupComponent extends BaseComponent {
     }
 
     @selfbind
-    mouseOver(id, ev) {
+    mouseOver(id, ev, target = null) {
+        if (id === null) {
+            let node = target;
+            while (node && !id) {
+                id = node.dataset && node.dataset["captureIndex"];
+                node = node.parentNode;
+            }
+            id = parseInt(id);
+        }
         const idx = this.findIndexOfId(id);
         if (this.state.stage === "activated" && id !== this.state.moving && this.state.selected !== id) {
             console.log("SWAPPING", id, this.state.selected)
@@ -241,9 +255,10 @@ export default class WindowGroupComponent extends BaseComponent {
     } 
 
     getBackgroundStyle(which) {
+        const sidx = this.findIndexOfId(this.state.selected);
         switch (which) {
             case "left": 
-                if (this.state.selected === -1 || this.findIndexOfId(this.state.selected) === 0) {
+                if (sidx === -1 || sidx === 0) {
                     return {
                         display: "none",
                     }
@@ -252,7 +267,7 @@ export default class WindowGroupComponent extends BaseComponent {
                         left: this.state.staticLocations[0],
                         top: this.offsets.top,
                         bottom: this.offsets.top,
-                        width: this.widthUntil(this.findIndexOfId(this.state.selected)),
+                        width: this.widthUntil(sidx),
                         transitionDuration: "0ms",
                     }
                     if (this.state.stage === "activated") {
@@ -260,19 +275,19 @@ export default class WindowGroupComponent extends BaseComponent {
                             left: this.state.locations[0],
                             top: this.state.verticals[0],
                             bottom: this.state.verticals[0],
-                            width: this.widthUntil(this.findIndexOfId(this.state.selected)),
+                            width: this.widthUntil(sidx),
                             transitionDuration: `${this.offsets.duration}ms`,
                         }
                     }
                     return styl;
                 }
             case "right": 
-                if (this.state.selected === -1) {
+                if (sidx === -1) {
                     return {
                         display: "none",
                     }
                 } else {
-                    const idx = this.findIndexOfId(this.state.selected);
+                    const idx = sidx;
                     let styl = {
                         left: this.state.staticLocations[idx + 1],
                         top: this.offsets.top,
@@ -292,7 +307,7 @@ export default class WindowGroupComponent extends BaseComponent {
                     return styl;
                 }
             case "center": 
-                if (this.state.selected === -1) {      
+                if (sidx === -1) {      
                     return {
                         left: this.sizes.margin / 2,
                         top: this.offsets.top,
@@ -302,17 +317,17 @@ export default class WindowGroupComponent extends BaseComponent {
                     }
                 } else {
                     let styl = {
-                        left: this.state.staticLocations[this.findIndexOfId(this.state.selected)],
+                        left: this.state.staticLocations[sidx],
                         top: this.offsets.top,
                         bottom: this.offsets.top,
-                        width: this.state.items[this.findIndexOfId(this.state.selected)].props.width,
+                        width: this.state.items[sidx].props.width,
                     };
                     if (this.state.stage === "activated") {
                         styl = {...styl, 
-                            left: this.state.locations[this.findIndexOfId(this.state.selected)],
-                            top: this.state.verticals[this.findIndexOfId(this.state.selected)],
-                            bottom: this.state.verticals[this.findIndexOfId(this.state.selected)],
-                            width: this.state.widths[this.findIndexOfId(this.state.selected)],
+                            left: this.state.locations[sidx],
+                            top: this.state.verticals[sidx],
+                            bottom: this.state.verticals[sidx],
+                            width: this.state.widths[sidx],
                             transitionDuration: `${this.offsets.duration}ms`,
                         };
                     } else {
