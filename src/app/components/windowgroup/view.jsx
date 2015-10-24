@@ -1,47 +1,37 @@
 import React from "react";
-import WindowGroupContainer from "./windowgroupcontainer";
+import {VelocityComponent} from "velocity-react";
 
 export default class WindowGroupViews {
     static get processedChildren() {
-        return (this.state.items || []).map((it, index) => 
+        return (this.props.children || []).map((it, index) => 
                 <span 
-                    key={it.props.index} 
                     id={it.props.index}
-                    ref={`item-${it.props.index}`}
-                    className={[this.styles.itemwrapper, this.state.swap === it.props.index && [this.styles.hidden, (this.state.swap > this.state.selected ? this.styles.right : this.styles.left)].join(" ") ].join(" ")} 
-                    onMouseDown={() => this.mouseDown(it.props.index)}
+                    className={[this.styles.itemwrapper, it.props.index === this.state.selected && this.styles.selected].join(" ")}
+                    onMouseDown={(ev) => this.mouseDown(it.props.index, ev)}
                     onMouseMove={(ev) => this.mouseOver(it.props.index, ev)}
-                >{it}</span>
+                    style={this.getStyles(it.props.index)}
+                >
+                {it}</span>
             );
     }
-    static get splitView() {
-        const children = this.views.processedChildren,
-            selectedindex = children.map(it => it.props.children.props.index).indexOf(this.state.selected);
-        switch (this.state.selected) {
-            case 0: return [
-                this.views.container(children.slice(selectedindex, selectedindex + 1), true),
-                this.views.container(children.slice(selectedindex + 1, children.length)),
-            ];
-            case children.length - 1: return [
-                this.views.container(children.slice(0, selectedindex )),
-                this.views.container(children.slice(selectedindex, selectedindex + 1).concat([children[selectedindex + 2]]), true),
-            ];
-            default: return [
-                this.views.container(children.slice(0, selectedindex )),
-                this.views.container(children.slice(selectedindex, selectedindex + 1), true),
-                this.views.container(children.slice(selectedindex + 1, children.length)),
-            ];
-        }
+    static background(which) {
+        return <span className={this.styles.background} style={this.getBackgroundStyle(which)}></span>
     }
-    static get normalView() {
-        return this.views.container(this.views.processedChildren);
-    }
-    static container(children, dragflag = false) {
-        return <WindowGroupContainer drag={dragflag} className={this.state.stage}>{children}</WindowGroupContainer>
+    static get backgrounds() {
+        return [
+            this.views.background("left"),
+            this.views.background("center"),
+            this.views.background("right"),
+        ];
     }
     static render() {
-        return <section className={this.styles.wrapper} onMouseUp={this.mouseUp} onMouseLeave={this.mouseUp} >
-            { this.state.selected >= 0 ? this.views.splitView : this.views.normalView }
+        return <section 
+            className={this.styles.wrapper} 
+            onMouseUp={this.mouseUp} 
+            onMouseLeave={this.mouseUp} 
+            style={this.rootStyles}
+        > 
+        { [ this.views.backgrounds, this.views.processedChildren ] }
         </section>
     }
 }

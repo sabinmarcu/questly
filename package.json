@@ -44,6 +44,7 @@
     "stylus-loader": "^1.2.1",
     "url-loader": "^0.5.6",
     "velocity-animate": "^1.2.3",
+    "velocity-react": "^1.1.1",
     "velocity-transition-group": "^1.1.2",
     "webpack-dev-server": "^1.10.1"
   }

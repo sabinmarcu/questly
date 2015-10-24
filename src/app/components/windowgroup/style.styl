@@ -2,17 +2,14 @@
 marg=100px
 
 .wrapper
-    display flex
-    flex-flow row nowrap
-    height s('calc(%s - %s)', hundred, marg)
-    margin 50px 0
+    position absolute
     
 .itemwrapper
     display flex
-    width 300px
-    height 100%
-    transition: all 0.3s ease-in-out;
-    &.hidden
-        transform: scale(0.5);
-        opacity: 0;
-        width: 0;
+    position fixed
+    transition all 0.5s mdtiming
+    
+.background
+    transition all 0.5s mdtiming
+    box-shadow 0 4px 8px rgba(black, 0.2)
+    position fixed
