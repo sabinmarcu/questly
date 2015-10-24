@@ -20,6 +20,7 @@ export default class WindowGroupComponent extends BaseComponent {
         widths: [],
         verticals: [],
         zindexes: [],
+        percentages: [],
         moving: false,
     }
 
@@ -36,13 +37,18 @@ export default class WindowGroupComponent extends BaseComponent {
     componentDidMount() {
         this.refreshThings();
         window.addEventListener("resize", this.refreshThings);
+        window.addEventListener("mouseup", this.mouseUp);
+        window.addEventListener("mouseleave", this.mouseUp);
     }
 
     @selfbind
     refreshThings() {
-        let prev = this.sizes.margin / 2, locs = this.props.children.map(
+        let widths = this.props.children.map(it => it.props.width),
+            percentages = widths.map(it => it / this.sizes.width);
+        widths = widths.map((it, index) => it + (this.sizes.margin < 0 && this.sizes.margin * percentages[index] ));
+        let prev = this.sizes.margin > 0 && this.sizes.margin / 2 || 0, locs = widths.map(
                 (it, index) => {
-                    let ret = prev; prev = prev + it.props.width;
+                    let ret = prev; prev = prev + it;
                     return ret;
                 }
             );
@@ -50,7 +56,8 @@ export default class WindowGroupComponent extends BaseComponent {
             items: this.props.children,
             staticLocations: locs,
             locations: locs,
-            widths: this.props.children.map(it => it.props.width),
+            widths: widths,
+            percentages: percentages,
             verticals: Array.apply(null, Array(this.props.children.length)).map(it => this.offsets.top),
             zindexes: Array.apply(null, Array(this.props.children.length)).map(it => 1),
             width: window.innerWidth,
@@ -82,13 +89,14 @@ export default class WindowGroupComponent extends BaseComponent {
     @selfbind
     mouseDown(id, ev) {
         const idx = this.findIndexOfId(id);
+        // debugger;
         this.setState({
             selected: id, 
             stage: "activating",
             locations: this.state.staticLocations.map(
                 (it, index) => it + this.offsetWidth(index, idx) - ((idx === index) && this.offsets.zoom / 2 || 0)
             ),
-            widths: this.state.items.map((it, index) => it.props.width + (index === idx && this.offsets.zoom || 0)),
+            widths: this.state.items.map((it, index) => it.props.width + (this.sizes.margin < 0 && this.sizes.margin * this.state.percentages[index]) + (index === idx && this.offsets.zoom || 0)),
             verticals: this.state.items.map((it, index) => this.offsets.top - (index === idx && this.offsets.zoom || 0)),
             zindexes: this.state.items.map((it, index) => (index === idx && 2 || 1)),
         });
@@ -102,7 +110,7 @@ export default class WindowGroupComponent extends BaseComponent {
         this.setState({
             stage: "deactivating",
             locations: _.clone(this.state.staticLocations),
-            widths: this.state.items.map(it => it.props.width),
+            widths: this.state.items.map((it, index) => it.props.width + (this.sizes.margin < 0 && this.sizes.margin * this.state.percentages[index])),
             verticals: Array.apply(null, Array(this.props.children.length)).map(it => this.offsets.top),
             zindexes: Array.apply(null, Array(this.props.children.length)).map(it => 1),
         });
@@ -117,14 +125,14 @@ export default class WindowGroupComponent extends BaseComponent {
         const idx = this.findIndexOfId(id);
         if (this.state.stage === "activated" && id !== this.state.moving && this.state.selected !== id) {
             console.log("SWAPPING", id, this.state.selected)
-            const swapped = swap(this.state.items, idx, this.findIndexOfId(this.state.selected)), swappedLocations = swap(this.state.staticLocations, idx, this.findIndexOfId(this.state.selected));
-
-            let prev = this.sizes.margin / 2, locs = swapped.map(
+            const swapped = swap(this.state.items, idx, this.findIndexOfId(this.state.selected)), swappedLocations = swap(this.state.staticLocations, idx, this.findIndexOfId(this.state.selected)), swappedPercentages = swap(this.state.percentages, idx, this.findIndexOfId(this.state.selected));
+            let prev = this.sizes.margin > 0 && this.sizes.margin / 2 || 0, locs = swapped.map(
                 (it, index) => {
-                    let ret = prev; prev = prev + it.props.width;
+                    let ret = prev; prev = prev + it.props.width + (this.sizes.margin < 0 && this.sizes.margin * swappedPercentages[index]);
                     return ret;
                 }
             );
+            console.log("LOCS", locs);
             this.setState({
                 moving: id,
                 items: swapped, 
@@ -132,7 +140,8 @@ export default class WindowGroupComponent extends BaseComponent {
                     (it, index) => it + this.offsetWidth(index, idx) - ((idx === index) && this.offsets.zoom / 2 || 0)
                 ),
                 staticLocations: locs,
-                widths: swapped.map((it, index) => it.props.width + (index === idx && this.offsets.zoom || 0)),
+                percentages: swappedPercentages,
+                widths: swapped.map((it, index) => it.props.width + (this.sizes.margin < 0 && this.sizes.margin * swappedPercentages[index])+ (index === idx && this.offsets.zoom || 0)),
                 verticals: swapped.map((it, index) => this.offsets.top - (index === idx && this.offsets.zoom || 0)),
                 zindexes: swapped.map((it, index) => (index === idx && 2 || 1)),
             });
@@ -179,6 +188,7 @@ export default class WindowGroupComponent extends BaseComponent {
     }
 
     getStyles(id) {
+        const idx = this.findIndexOfId(id), sidx = this.findIndexOfId(this.state.selected);
         return { 
             top: this.state.verticals[this.findIndexOfId(id)], 
             bottom: this.state.verticals[this.findIndexOfId(id)],
@@ -187,6 +197,38 @@ export default class WindowGroupComponent extends BaseComponent {
             left: this.state.locations[this.findIndexOfId(id)],
             transitionDuration: `${this.offsets.duration}ms`,
             zIndex: this.state.zindexes[this.findIndexOfId(id)],
+            borderTopLeftRadius: 
+                (
+                    (id === this.state.selected) ||
+                    (this.state.selected !== -1 && 
+                        (idx === 0) ||
+                        (idx === sidx + 1)
+                    )
+                ) && "2px" || "0px",
+            borderTopRightRadius: 
+                (
+                    (id === this.state.selected) ||
+                    (this.state.selected !== -1 && 
+                        (idx === this.state.items.length - 1) ||
+                        (idx === sidx - 1)
+                    )
+                ) && "2px" || "0px",
+            borderBottomLeftRadius: 
+                (
+                    (id === this.state.selected) ||
+                    (this.state.selected !== -1 && 
+                        (idx === 0) ||
+                        (idx === sidx + 1)
+                    )
+                ) && "2px" || "0px",
+            borderBottomRightRadius: 
+                (
+                    (id === this.state.selected) ||
+                    (this.state.selected !== -1 && 
+                        (idx === this.state.items.length - 1) ||
+                        (idx === sidx - 1)
+                    )
+                ) && "2px" || "0px",
         };
     } 
 

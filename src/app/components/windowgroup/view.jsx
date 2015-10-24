@@ -26,9 +26,8 @@ export default class WindowGroupViews {
     }
     static render() {
         return <section 
-            className={this.styles.wrapper} 
+            className={[this.styles.wrapper, this.state.stage].join(" ")} 
             onMouseUp={this.mouseUp} 
-            onMouseLeave={this.mouseUp} 
             style={this.rootStyles}
         > 
         { [ this.views.backgrounds, this.views.processedChildren ] }
